@@ -1,25 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-double **allocate_matrix(int l, int r) {
+typedef int (FUNC)(int, double **);
+
+double **allocate_matrix(int dimension) {
     // ponteiro para a matriz
     double **v;
 
     // Verifica os parâmetros recebidos
-    if (l < 1 || r < 1) {
+    if (dimension < 1) {
         printf("** Error: Parâmetros inválido **\n");
-        return (NULL);
-    }
-
-    if (l != r) {
-        printf("** Error: matriz não é quadrada **\n");
         return (NULL);
     }
 
     /* ** Alocação de linhas da matriz ** */
 
     // Um vetor de m ponteiros para double
-    v = (double **) calloc(l, sizeof(double *));
+    v = (double **) calloc(dimension, sizeof(double *));
 
     // Verifica se foi alocado memória
     if (v == NULL) {
@@ -28,9 +26,9 @@ double **allocate_matrix(int l, int r) {
     }
 
     /* ** aloca as colunas da matriz ** */
-    for (int i = 0; i < l; i++) {
+    for (int i = 0; i < dimension; i++) {
         // l vetores de r doubles
-        v[i] = (double *) calloc(r, sizeof(double));
+        v[i] = (double *) calloc(dimension, sizeof(double));
         if (v[i] == NULL) {
             printf("** Error: Memória Insuficiente **");
             return (NULL);
@@ -39,22 +37,17 @@ double **allocate_matrix(int l, int r) {
     return (v); // retorna o ponteiro para a matriz
 }
 
-double **deallocate_matrix(int l, int r, double **v) {
+double **deallocate_matrix(int dimension, double **v) {
     if (v == NULL) return (NULL);
 
     // verifica parâmetros recebidos
-    if (l < 1 || r < 1) {
+    if (dimension < 1) {
         printf("** Error: Parâmetros inválidos **\n");
         return (v);
     }
 
-    if (l != r) {
-        printf("** Error: matriz não é quadrada **\n");
-        return (v);
-    }
-
     // libera as linhas da matriz
-    for (int i = 0; i < l; i++) {
+    for (int i = 0; i < dimension; i++) {
         free(v[i]);
     }
 
@@ -65,11 +58,11 @@ double **deallocate_matrix(int l, int r, double **v) {
     return (NULL);
 }
 
-void print_matrix(int l, int r, double **matrix) {
+void print_matrix(int dimension, double **matrix) {
     printf("[\n");
-    for (int i = 0; i < l; i++) {
+    for (int i = 0; i < dimension; i++) {
         printf("[");
-        for (int j = 0; j < r; j++) {
+        for (int j = 0; j < dimension; j++) {
             printf("%lf ", matrix[i][j]);
         }
         printf("]\n");
@@ -77,9 +70,9 @@ void print_matrix(int l, int r, double **matrix) {
     printf("]\n");
 }
 
-int is_diagonal_matrix(int l, int r, double **matrix) {
-    for (int i = 0; i < l; i++) {
-        for (int j = 0; j < r; j++) {
+int is_diagonal_matrix(int dimension, double **matrix) {
+    for (int i = 0; i < dimension; i++) {
+        for (int j = 0; j < dimension; j++) {
             if (i == j) {
                 if (matrix[i][j] != 0) {
                     return 0;
@@ -90,14 +83,14 @@ int is_diagonal_matrix(int l, int r, double **matrix) {
     return 1;
 }
 
-int is_bottom_diagonal(int m, int n, double **matrix) {
+int is_bottom_diagonal(int dimension, double **matrix) {
     /*
      *  a11  0   0
      *  a21 a22  0
      *  a31 a32 a33
      * */
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < dimension; i++) {
+        for (int j = 0; j < dimension; j++) {
             if (i < j) {
                 if (matrix[i][j] != 0) {
                     return 0;
@@ -108,14 +101,14 @@ int is_bottom_diagonal(int m, int n, double **matrix) {
     return 1;
 }
 
-int is_upper_diagonal(int m, int n, double **matrix) {
+int is_upper_diagonal(int dimension, double **matrix) {
     /*
      *  a11 a12 a13
      *  0   a22 a23
      *  0   0   a33
      * */
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < dimension; i++) {
+        for (int j = 0; j < dimension; j++) {
             if (i > j) {
                 if (matrix[i][j] != 0) {
                     return 0;
@@ -126,29 +119,57 @@ int is_upper_diagonal(int m, int n, double **matrix) {
     return 1;
 }
 
-int main() {
-    double **mat;
-    int l, c;
-    int i, j;
+int execute(FUNC func, int dimension, double **mat) {
+    return (*func)(dimension, mat);
+}
 
-    l = 4;
-    c = 4;
-
-    mat = allocate_matrix(l, c);
-
-    for (i = 0; i < l; i++) {
-        for (j = 0; j < c; j++) {
-            mat[i][j] = 1;
+void fill_matrix(int dimension, double **mat) {
+    for (int i = 0; i < dimension; i++) {
+        for (int j = 0; j < dimension; j++) {
+            printf("Informe o dado Matriz[%d][%d]: ", i, j);
+            scanf("%lf", &mat[i][j]);
         }
     }
+}
 
-    print_matrix(l, c, mat);
+int main(void) {
+    double **mat;
+    int dimension, proc;
 
-    printf("is_diagonal_matrix: %d\n", is_diagonal_matrix(l, c, mat));
-    printf("is_bottom_diagonal: %d\n", is_bottom_diagonal(l, c, mat));
-    printf("is_bottom_diagonal: %d\n", is_upper_diagonal(l, c, mat));
+    printf("Informe a dimensão da matriz (ex:3): ");
+    scanf("%d", &dimension);
 
-    mat = deallocate_matrix(l, c, mat);
+    mat = allocate_matrix(dimension);
 
-    return 0;
+    FUNC *functions[3];
+    functions[0] = &is_diagonal_matrix;
+    functions[1] = &is_bottom_diagonal;
+    functions[2] = &is_upper_diagonal;
+
+    fill_matrix(dimension, mat);
+
+    printf("Qual procedimento deve ser executado?\n");
+    printf("[1] - Diagonal;\n");
+    printf("[2] - Triangular inferior;\n");
+    printf("[3] - Triangular superior;\n");
+    scanf("%d", &proc);
+
+    if (proc < 1 || proc > 3) {
+        printf("Método informado é inválido");
+        exit(EXIT_FAILURE);
+    }
+
+    print_matrix(dimension, mat);
+
+    int exec_result = execute(functions[proc - 1], dimension, mat);
+
+    if (exec_result) {
+        printf("A matriz é do tipo selecionado");
+    } else {
+        printf("A matriz não é do tipo selecionado");
+    }
+
+    mat = deallocate_matrix(dimension, mat);
+
+    exit(EXIT_SUCCESS);
 }
