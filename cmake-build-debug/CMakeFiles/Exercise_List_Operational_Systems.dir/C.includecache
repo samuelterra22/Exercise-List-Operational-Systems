@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/samuel/Dropbox/Master degree/Classes/2019-2/PCC508 - Sistemas Operacionais/Exercise-List-Operational-Systems/List_01/exercise_02.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+
