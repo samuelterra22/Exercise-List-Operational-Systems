@@ -123,32 +123,32 @@ Exercise_List_Operational_Systems/fast:
 	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/build
 .PHONY : Exercise_List_Operational_Systems/fast
 
-List_02/exercise_01.o: List_02/exercise_01.c.o
+List_02/exercise_02.o: List_02/exercise_02.c.o
 
-.PHONY : List_02/exercise_01.o
+.PHONY : List_02/exercise_02.o
 
 # target to build an object file
-List_02/exercise_01.c.o:
-	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_02/exercise_01.c.o
-.PHONY : List_02/exercise_01.c.o
+List_02/exercise_02.c.o:
+	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_02/exercise_02.c.o
+.PHONY : List_02/exercise_02.c.o
 
-List_02/exercise_01.i: List_02/exercise_01.c.i
+List_02/exercise_02.i: List_02/exercise_02.c.i
 
-.PHONY : List_02/exercise_01.i
+.PHONY : List_02/exercise_02.i
 
 # target to preprocess a source file
-List_02/exercise_01.c.i:
-	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_02/exercise_01.c.i
-.PHONY : List_02/exercise_01.c.i
+List_02/exercise_02.c.i:
+	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_02/exercise_02.c.i
+.PHONY : List_02/exercise_02.c.i
 
-List_02/exercise_01.s: List_02/exercise_01.c.s
+List_02/exercise_02.s: List_02/exercise_02.c.s
 
-.PHONY : List_02/exercise_01.s
+.PHONY : List_02/exercise_02.s
 
 # target to generate assembly for a file
-List_02/exercise_01.c.s:
-	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_02/exercise_01.c.s
-.PHONY : List_02/exercise_01.c.s
+List_02/exercise_02.c.s:
+	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_02/exercise_02.c.s
+.PHONY : List_02/exercise_02.c.s
 
 # Help Target
 help:
@@ -159,9 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Exercise_List_Operational_Systems"
 	@echo "... edit_cache"
-	@echo "... List_02/exercise_01.o"
-	@echo "... List_02/exercise_01.i"
-	@echo "... List_02/exercise_01.s"
+	@echo "... List_02/exercise_02.o"
+	@echo "... List_02/exercise_02.i"
+	@echo "... List_02/exercise_02.s"
 .PHONY : help
 
 

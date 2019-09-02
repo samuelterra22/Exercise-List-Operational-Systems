@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/samuel/Dropbox/Master degree/Classes/2019-2/PCC508 - Sistemas Operacionais/Exercise-List-Operational-Systems/List_02/exercise_01.c
+/home/samuel/Dropbox/Master degree/Classes/2019-2/PCC508 - Sistemas Operacionais/Exercise-List-Operational-Systems/List_02/exercise_02.c
 stdio.h
 -
 stdlib.h
@@ -14,5 +14,7 @@ stdlib.h
 unistd.h
 -
 sys/wait.h
+-
+time.h
 -
 
