@@ -2,18 +2,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <time.h>
 
 /*************************************************************************
- A chamada de sistema fork é utilizada para a criação de um
- processo filho que é um clone do processo pai. Fazer um programa que:
- - O processo inicial cria 2 processos filhos
- - Cada filho cria mais 2 processos
- Assim, no final teremos 7 processos.
- Os processos, exceto os netos, ficarão esperando o encerramento dos
- respetivos filhos (chamada de sistema wait). Os processos netos
- executarão o comando ls (utilizando a chamada execve). Cada processo
- que estava esperando, após o retorno, imprimem seu respectivo PID e
- encerram.
+ No presente exercício, o processo inicial deve criar 3 processos filhos.
+ Cada filho criará mais 3 processos. Assim, teremos ao todo 13 processos.
+ Cada processo neto sorteará um número aleatório entre 0 e 100 e o mandará
+ para o processo filho através de um pipe. O processo filho ordenará os
+ números recebidos em ordem crescente e os mandará para o pai através do
+ pipe. O processo pai agora fará a ordenação dos dados recebidos e os
+ imprimirá na tela. Note que a ordernação deve ser feita utilizando-se a
+ função merge (como no mergesort).
  ************************************************************************/
 
 enum TYPE {
@@ -53,8 +52,12 @@ int main(int argc, const char *argv[]) {
         while (wait(NULL) > 0);
         printf("Sou o tipo %d e meu pid é %d.\n", type, getpid());
     } else {
-        // senão são netos e executa a listagem de diretório
-        execlp("/bin/ls", "ls", NULL);
+        // senão são netos e executa sorteia um numero
+        srand(time(NULL) ^ getpid() << 16);
+        int r = rand() % 101;
+        printf("%d \n", r);
+
+        // envia por pipe
     }
 
     exit(EXIT_SUCCESS);
