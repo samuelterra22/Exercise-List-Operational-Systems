@@ -157,7 +157,7 @@ void fill_matrix(int dimension, double **mat) {
     }
 }
 
-int main(void) {
+int main(int argc, const char *argv[]) {
     double **mat;
     int dimension, proc;
 

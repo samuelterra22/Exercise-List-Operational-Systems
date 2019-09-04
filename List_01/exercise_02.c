@@ -187,7 +187,7 @@ void insert_process_for_user_list(UserList *userList, int userId, char *processN
     }
 }
 
-int main(void) {
+int main(int argc, const char *argv[]) {
     UserList *userList = init_user_list();
     int quantity = 0;
     int uid;
