@@ -19,6 +19,9 @@ enum TYPE {
     DAD, SON, GRANDSON
 };
 
+#define READ 0
+#define WRITE 1
+
 int main(int argc, const char *argv[]) {
 
     // inicia o tipo como sendo PAI
@@ -27,8 +30,15 @@ int main(int argc, const char *argv[]) {
     // variável para guarda o pid do processo
     pid_t pid;
 
+    // file descriptor
+    int file_descriptor[3][2];
+
+    pipe(file_descriptor[0]);
+    pipe(file_descriptor[1]);
+    pipe(file_descriptor[2]);
+
     // cria os FILHOS
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 3; ++i) {
         if (type == DAD) {
             pid = fork();
             if (pid == 0) {
@@ -38,7 +48,7 @@ int main(int argc, const char *argv[]) {
     }
 
     // cria os NETOS
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 3; ++i) {
         if (type == SON) {
             pid = fork();
             if (pid == 0) {
@@ -50,14 +60,26 @@ int main(int argc, const char *argv[]) {
     // se o tipo for diferente de NETOS, espera os netos terminarem a 'tarefa'
     if (type != GRANDSON) {
         while (wait(NULL) > 0);
-        printf("Sou o tipo %d e meu pid é %d.\n", type, getpid());
-    } else {
-        // senão são netos e executa sorteia um numero
-        srand(time(NULL) ^ getpid() << 16);
-        int r = rand() % 101;
-        printf("%d \n", r);
 
-        // envia por pipe
+        /* Parent process closes up output side of pipe */
+        close(file_descriptor[0][WRITE]);
+
+        int readbuffer;
+
+        /* Read in a string from the pipe */
+        read(file_descriptor[0][READ], &readbuffer, sizeof(int));
+        printf("Received: %d\n", readbuffer);
+    } else {
+        close(file_descriptor[0][READ]);
+
+        srand(time(NULL) ^ getpid() << 16);
+        int number = rand() % 101;
+
+        printf("Sent: %d\n", number);
+
+        /* Send "string" through the output side of pipe */
+        write(file_descriptor[0][WRITE], &number, sizeof(int));
+        _exit(0);
     }
 
     exit(EXIT_SUCCESS);
