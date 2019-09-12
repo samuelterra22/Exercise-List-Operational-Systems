@@ -3,18 +3,17 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-/*************************************************************************
- A chamada de sistema fork é utilizada para a criação de um
- processo filho que é um clone do processo pai. Fazer um programa que:
- - O processo inicial cria 2 processos filhos
- - Cada filho cria mais 2 processos
- Assim, no final teremos 7 processos.
- Os processos, exceto os netos, ficarão esperando o encerramento dos
- respetivos filhos (chamada de sistema wait). Os processos netos
- executarão o comando ls (utilizando a chamada execve). Cada processo
- que estava esperando, após o retorno, imprimem seu respectivo PID e
- encerram.
- ************************************************************************/
+/******************************************************************************
+ * A chamada de sistema fork é utilizada para a criação de um processo  filho
+ * que é um clone do processo pai. Fazer um programa que:
+ * - O processo inicial cria 2 processos filhos
+ * - Cada filho cria mais 2 processos
+ * Assim, no final teremos 7 processos.
+ * Os processos, exceto os netos, ficarão esperando o encerramento dos
+ * respetivos filhos (chamada de sistema wait). Os processos netos executarão o
+ * comando ls (utilizando a chamada execve). Cada processo que estava
+ * esperando, após o retorno, imprimem seu respectivo PID e encerram.
+ *****************************************************************************/
 
 enum TYPE {
     DAD, SON, GRANDSON
@@ -57,5 +56,5 @@ int main(int argc, const char *argv[]) {
         execlp("/bin/ls", "ls", NULL);
     }
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

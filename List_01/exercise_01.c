@@ -2,30 +2,36 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
- Uma matriz é classificada como diagonal, se todos os elementos que não estão na diagonal principal
-forem zero. Triangular inferior é a matriz com a seguinte propriedade: todos os elementos acima (não
-inclusive) da diagonal principal têm valor zero. Quando todos os elementos abaixo da mesma diagonal
-têm valor zero, a matriz é classificada como triangular superior.
-
-Criar um programa que receba do usuário o tamanho da matriz e crie a mesma utilizando
-alocação dinâmica. Nessa alocação dinâmica, os dados (double) da matriz devem ficar em um espaço
-contíguo da memória. Após isso, o usuário irá entrar com os dados da matriz.
-
-O seu programa deve também criar um array de ponteiros. Esse array conterá 3 ponteiros para
-funções que recebem uma matriz com o devido tamanho e retornam um inteiro. A primeira função
-retorna 0 se a matriz não for diagonal e 1 caso contrário. A segunda faz o mesmo para matriz triangular
-inferior e a terceira para matriz triangular superior. Um outro procedimento deve ser criado, que recebe
-a matriz com o tamanho e a função que dever ser aplicada. Esse procedimento aplica a função e escreve
-na tela: “a matriz é do tipo selecionado” se o resultado for 1 e “não é do tipo selecionado” se o
-resultado for 0. O programa principal, depois de ler os dados da matriz, deve receber do usuário qual o
-tipo de teste a ser feito (1-diagonal, 2-triangular inferior, 3-triangular superior) e deve chamar esse
-procedimento passando como parâmetro o endereço da função solicitada.
-
-No final, o conteúdo da matriz deve ser impresso na tela utilizando para isso um ponteiro que
-anda em toda estrutura de dados contínua da matriz imprimindo seu conteúdo.
-
- * */
+/******************************************************************************
+ * Uma matriz é classificada como diagonal, se todos os elementos que não
+ * estão na diagonal principal forem zero. Triangular inferior é a matriz com
+ * a seguinte propriedade: todos os elementos acima (não inclusive) da
+ * diagonal principal têm valor zero. Quando todos os elementos abaixo da
+ * mesma diagonal têm valor zero, a matriz é classificada como triangular
+ * superior.
+ *
+ * Criar um programa que receba do usuário o tamanho da matriz e crie a mesma
+ * utilizando alocação dinâmica. Nessa alocação dinâmica, os dados (double) da
+ * matriz devem ficar em um espaço contíguo da memória. Após isso, o usuário
+ * irá entrar com os dados da matriz.
+ *
+ * O seu programa deve também criar um array de ponteiros. Esse array conterá
+ * 3 ponteiros para funções que recebem uma matriz com o devido tamanho e
+ * retornam um inteiro. A primeira função retorna 0 se a matriz não for
+ * diagonal e 1 caso contrário. A segunda faz o mesmo para matriz triangular
+ * inferior e a terceira para matriz triangular superior. Um outro
+ * procedimento deve ser criado, que recebe a matriz com o tamanho e a função
+ * que dever ser aplicada. Esse procedimento aplica a função e escreve na tela:
+ * “a matriz é do tipo selecionado” se o resultado for 1 e “não é do tipo
+ * selecionado” se o resultado for 0. O programa principal, depois de ler os
+ * dados da matriz, deve receber do usuário qual o tipo de teste a ser feito
+ * (1-diagonal, 2-triangular inferior, 3-triangular superior) e deve chamar
+ * esse procedimento passando como parâmetro o endereço da função solicitada.
+ *
+ * No final, o conteúdo da matriz deve ser impresso na tela utilizando para
+ * isso um ponteiro que anda em toda estrutura de dados contínua da matriz
+ * imprimindo seu conteúdo.
+ *****************************************************************************/
 
 typedef int (FUNC)(int, double **);
 
@@ -196,5 +202,5 @@ int main(int argc, const char *argv[]) {
 
     mat = deallocate_matrix(dimension, mat);
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

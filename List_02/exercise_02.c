@@ -4,16 +4,16 @@
 #include <sys/wait.h>
 #include <time.h>
 
-/*************************************************************************
- No presente exercício, o processo inicial deve criar 3 processos filhos.
- Cada filho criará mais 3 processos. Assim, teremos ao todo 13 processos.
- Cada processo neto sorteará um número aleatório entre 0 e 100 e o mandará
- para o processo filho através de um pipe. O processo filho ordenará os
- números recebidos em ordem crescente e os mandará para o pai através do
- pipe. O processo pai agora fará a ordenação dos dados recebidos e os
- imprimirá na tela. Note que a ordernação deve ser feita utilizando-se a
- função merge (como no mergesort).
- ************************************************************************/
+/******************************************************************************
+ * No presente exercício, o processo inicial deve criar 3 processos filhos.
+ * Cada filho criará mais 3 processos. Assim, teremos ao todo 13 processos.
+ * Cada processo neto sorteará um número aleatório entre 0 e 100 e o mandará
+ * para o processo filho através de um pipe. O processo filho ordenará os
+ * números recebidos em ordem crescente e os mandará para o pai através do
+ * pipe. O processo pai agora fará a ordenação dos dados recebidos e os
+ * imprimirá na tela. Note que a ordernação deve ser feita utilizando-se a
+ * função merge (como no mergesort).
+ *****************************************************************************/
 
 enum TYPE {
     DAD, SON, GRANDSON
@@ -176,5 +176,5 @@ int main(int argc, const char *argv[]) {
 
     }
 
-    exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
