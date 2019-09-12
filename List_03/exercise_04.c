@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /******************************************************************************
  * No presente exercício, um interpretador de comandos deve ser criado. Ele
@@ -13,9 +14,25 @@
  * ligados por pipe (por exemplo: "ls | grep teste").
  *****************************************************************************/
 
+#define FALSE 0
+#define TRUE 1
+
 int main(int argc, const char *argv[]) {
 
-    printf("Exercício 04");
+    char command[100];
+    int exit_shell = FALSE;
+
+    while (!exit_shell) {
+        printf("> ");
+        scanf("%s", command);
+
+
+        if (strcmp(command, "exit") == 0) {
+            exit_shell = TRUE;
+            printf("God bye!\n");
+        }
+    }
+
 
     return EXIT_SUCCESS;
 }
