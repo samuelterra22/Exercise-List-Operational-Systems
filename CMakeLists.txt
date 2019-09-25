@@ -13,4 +13,16 @@ set(CMAKE_C_STANDARD 99)
 # add_executable(Exercise_List_Operational_Systems List_02/exercise_03.c)
 
 # List 03
-add_executable(Exercise_List_Operational_Systems List_03/exercise_04/exercise_04.c)
+add_executable(Exercise_List_Operational_Systems
+        List_01/exercise_01/source/main.c
+        List_01/exercise_02/source/main.c
+
+        List_02/exercise_01/source/main.c
+        List_02/exercise_02/source/main.c
+        List_02/exercise_02/source/main.c
+
+        List_03/exercise_01/source/main.c
+        List_03/exercise_02/source/main.c
+        List_03/exercise_03/source/main.c
+        List_03/exercise_04/source/main.c
+        )
