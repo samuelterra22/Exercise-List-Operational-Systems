@@ -123,32 +123,32 @@ Exercise_List_Operational_Systems/fast:
 	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/build
 .PHONY : Exercise_List_Operational_Systems/fast
 
-List_03/exercise_04.o: List_03/exercise_04.c.o
+List_03/exercise_04/exercise_04.o: List_03/exercise_04/exercise_04.c.o
 
-.PHONY : List_03/exercise_04.o
+.PHONY : List_03/exercise_04/exercise_04.o
 
 # target to build an object file
-List_03/exercise_04.c.o:
-	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04.c.o
-.PHONY : List_03/exercise_04.c.o
+List_03/exercise_04/exercise_04.c.o:
+	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04/exercise_04.c.o
+.PHONY : List_03/exercise_04/exercise_04.c.o
 
-List_03/exercise_04.i: List_03/exercise_04.c.i
+List_03/exercise_04/exercise_04.i: List_03/exercise_04/exercise_04.c.i
 
-.PHONY : List_03/exercise_04.i
+.PHONY : List_03/exercise_04/exercise_04.i
 
 # target to preprocess a source file
-List_03/exercise_04.c.i:
-	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04.c.i
-.PHONY : List_03/exercise_04.c.i
+List_03/exercise_04/exercise_04.c.i:
+	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04/exercise_04.c.i
+.PHONY : List_03/exercise_04/exercise_04.c.i
 
-List_03/exercise_04.s: List_03/exercise_04.c.s
+List_03/exercise_04/exercise_04.s: List_03/exercise_04/exercise_04.c.s
 
-.PHONY : List_03/exercise_04.s
+.PHONY : List_03/exercise_04/exercise_04.s
 
 # target to generate assembly for a file
-List_03/exercise_04.c.s:
-	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04.c.s
-.PHONY : List_03/exercise_04.c.s
+List_03/exercise_04/exercise_04.c.s:
+	$(MAKE) -f CMakeFiles/Exercise_List_Operational_Systems.dir/build.make CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04/exercise_04.c.s
+.PHONY : List_03/exercise_04/exercise_04.c.s
 
 # Help Target
 help:
@@ -159,9 +159,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Exercise_List_Operational_Systems"
 	@echo "... edit_cache"
-	@echo "... List_03/exercise_04.o"
-	@echo "... List_03/exercise_04.i"
-	@echo "... List_03/exercise_04.s"
+	@echo "... List_03/exercise_04/exercise_04.o"
+	@echo "... List_03/exercise_04/exercise_04.i"
+	@echo "... List_03/exercise_04/exercise_04.s"
 .PHONY : help
 
 

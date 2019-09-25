@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04.c.o"
+  "CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04/exercise_04.c.o"
   "Exercise_List_Operational_Systems.pdb"
   "Exercise_List_Operational_Systems"
 )
