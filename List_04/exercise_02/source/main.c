@@ -37,29 +37,29 @@ void leave_region(int process) {
 	interested[process] = FALSE;
 }
 
-void *thread_peterson(void *vargp) {
-	int *myid = (int *) vargp;
+void *thread_peterson(void *args) {
+	int *my_id = (int *) args;
 
 	for (int i = 0; i < N * 5; i++) {
-		enter_region(*myid);
+		enter_region(*my_id);
 
 		int local_counter = counter;
-		printf("Thread %d, Value of counter: %d\n", *myid, local_counter);
+		printf("Thread %d, Value of counter: %d\n", *my_id, local_counter);
 		pthread_yield();
 		counter = local_counter + 1;
 
-		leave_region(*myid);
+		leave_region(*my_id);
 	}
 
 	return NULL;
 }
 
-void *thread(void *vargp) {
-	int *myid = (int *) vargp;
+void *thread(void *args) {
+	int *my_id = (int *) args;
 
 	for (int i = 0; i < N * 5; i++) {
 		int local_counter = counter;
-		printf("Thread %d, Value of counter: %d\n", *myid, local_counter);
+		printf("Thread %d, Value of counter: %d\n", *my_id, local_counter);
 		pthread_yield();
 		counter = local_counter + 1;
 	}
