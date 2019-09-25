@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/Exercise_List_Operational_Systems.dir/List_03/exercise_04/exercise_04.c.o  -o Exercise_List_Operational_Systems 

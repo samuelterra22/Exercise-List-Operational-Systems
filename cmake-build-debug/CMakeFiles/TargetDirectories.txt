@@ -1,3 +1,0 @@
-/home/samuel/Dropbox/Master degree/Classes/2019-2/PCC508 - Sistemas Operacionais/Exercise-List-Operational-Systems/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/samuel/Dropbox/Master degree/Classes/2019-2/PCC508 - Sistemas Operacionais/Exercise-List-Operational-Systems/cmake-build-debug/CMakeFiles/Exercise_List_Operational_Systems.dir
-/home/samuel/Dropbox/Master degree/Classes/2019-2/PCC508 - Sistemas Operacionais/Exercise-List-Operational-Systems/cmake-build-debug/CMakeFiles/edit_cache.dir
