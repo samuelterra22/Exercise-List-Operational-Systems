@@ -31,6 +31,9 @@ CC_FLAGS=-c         \
 #         -ansi      \
 #         -pedantic
 
+# Extra flags from external libs
+CC_EXTRA_LIB_FLAGS=
+
 # Command used at clean target
 RM = rm -rf
 
@@ -42,7 +45,7 @@ all: objFolder $(OBJ_DIRS) $(PROJECT_NAME)
 
 $(PROJECT_NAME): $(OBJ)
 	@ echo 'Building binary using GCC linker: $@'
-	$(CC) $^ -o $@
+	$(CC) $^ $(CC_EXTRA_LIB_FLAGS) -o $@
 	@ echo ' '
 	@ echo 'Finished building binary: $@'
 	@ echo ' '
