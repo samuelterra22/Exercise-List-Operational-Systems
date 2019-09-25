@@ -69,15 +69,26 @@ void *thread(void *vargp) {
 
 int main(int argc, const char *argv[]) {
 	pthread_t thread_id[N];
-	int ids[N];
+	int ids[N], proc;
 
 	FUNC *functions[3];
 	functions[0] = &thread;
 	functions[1] = &thread_peterson;
 
+	printf("Qual versão deseja executar?\n");
+	printf("[1] - sem nenhum controle de condição de corrida;\n");
+	printf("[2] - utilizando a solução de Peterson;\n");
+	printf("Informe um valor [1-2]: ");
+	scanf("%d", &proc);
+
+	if (proc < 1 || proc > 2) {
+		printf("Método informado é inválido\n");
+		exit(EXIT_FAILURE);
+	}
+
 	for (int i = 0; i < N; i++) {
 		ids[i] = i;
-		if (pthread_create(&thread_id[i], NULL, thread_peterson, (void *) &ids[i]) != 0) {
+		if (pthread_create(&thread_id[i], NULL, functions[proc - 1], (void *) &ids[i]) != 0) {
 			printf("Thread not created.\n");
 			exit(0);
 		}
