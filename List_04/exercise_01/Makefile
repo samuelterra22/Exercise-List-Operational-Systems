@@ -8,3 +8,5 @@
 PROJECT_NAME=exercise01
 
 include ../../Makefile.mk
+
+CC_EXTRA_LIB_FLAGS=-lpthread
