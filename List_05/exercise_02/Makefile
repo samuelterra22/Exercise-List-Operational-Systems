@@ -5,8 +5,6 @@
 #################################################################
 
 # The project name
-PROJECT_NAME=exercise03
+PROJECT_NAME=exercise01
 
 include ../../Makefile.mk
-
-CC_EXTRA_LIB_FLAGS=-lpthread

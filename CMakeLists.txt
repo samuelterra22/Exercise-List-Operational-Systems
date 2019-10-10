@@ -30,4 +30,8 @@ add_executable(Exercise_List_Operational_Systems
         List_04/exercise_02/source/main.c
         List_04/exercise_03/source/main.c
         List_04/exercise_04/source/main.c
+
+        List_05/exercise_01/source/main.c
+        List_05/exercise_02/source/main.c
+        List_05/exercise_03/source/main.c
         )
