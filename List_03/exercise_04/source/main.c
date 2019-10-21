@@ -22,6 +22,7 @@
 #define MAX_COMMAND_LENGHT 100
 
 char **explode(char *str) {
+
     int i = 0, cont = 0;
     const char s[2] = " ";
     char *token;
@@ -34,17 +35,31 @@ char **explode(char *str) {
     while (token != NULL) {
         // printf(" %s\n", token);
 
+        printf("cu: %d\n", (i + 1) * sizeof(ret));
         ret = realloc(ret, (i + 1) * sizeof(ret));
         ret[i] = malloc(254 * sizeof(char *));
         strcpy(ret[i], token);
 
-        printf(" %s\n", ret[i]);
+//        printf(" %s\n", ret[i]);
 
         token = strtok(NULL, s);
         i++;
     }
+    printf("i: %d\n", i);
+
 
     return ret;
+}
+
+void pointer_to_char_vector(char **c) {
+    printf("vaca\n");
+    printf("%d\n", strlen(c));
+    printf("%d\n", sizeof(c));
+    printf("%d\n", strlen(*c));
+    printf("%d\n", sizeof(*c));
+    for (int j = 0; j < sizeof(*c); j++) {
+        printf("-> %s\n", c[j]);
+    }
 }
 
 int main(int argc, const char *argv[]) {
@@ -55,18 +70,33 @@ int main(int argc, const char *argv[]) {
     pid_t pid;
     char command_base[] = "/bin/";
 
-    char asd[] = "ls -a -l";
+    fgets(command, MAX_COMMAND_LENGHT, stdin);
+    char **c = explode(command);
+    // printf("depois do explode %s", command);
 
-    char **c = explode(asd);
-    for (int j = 0; j < sizeof(**c) - 1; j++) printf("%s\t", c[j]);
+    printf("1c: %d\n", strlen(c));
+    printf("2c: %d\n", sizeof(c));
+    printf("3c: %d\n", strlen(*c));
+    printf("4c: %d\n", sizeof(*c));
+    printf("5c: %d\n", strlen(**c));
+    printf("6c: %d\n", sizeof(**c));
 
-    printf("> ");
+//    pointer_to_char_vector(c);
+    for (int j = 0; j < sizeof(c) - 1; j++) printf("->%s\n", c[j]);
+
+
+
+    // printf("> ");
     while (!exit_shell) {
         scanf("%s", command);
 
         pid = fork();
 
         strcat(command_base, command);
+
+        char **c = explode(command);
+        printf("%s", command);
+        for (int j = 0; j < sizeof(**c) - 1; j++) printf("%s\t", c[j]);
 
         if (pid == 0) {
             char *argvs[3] = {command, NULL};
