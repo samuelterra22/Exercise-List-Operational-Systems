@@ -32,19 +32,19 @@ int produce_item() {
 
 void consume_item(int item) {
 	int n;
-	sem_getvalue(full, &n);
+	// sem_getvalue(full, &n);
 	printf("Consome item %d \n", buffer[n]);
 }
 
 void insert_item(int item) {
 	int n;
-	sem_getvalue(full, &n);
+	// sem_getvalue(full, &n);
 	buffer[n] = item;
 }
 
 int remove_item() {
 	int n;
-	sem_getvalue(full, &n);
+	// sem_getvalue(full, &n);
 	return buffer[n];
 }
 
