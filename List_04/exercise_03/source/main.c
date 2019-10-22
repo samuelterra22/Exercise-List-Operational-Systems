@@ -1,141 +1,89 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <semaphore.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/wait.h>
 #include <pthread.h>
+#include <unistd.h>
 
 /******************************************************************************
  * O problema 1 desta lista será implementado com threads e mutexes (POSIX).
  *****************************************************************************/
 
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-#define FALSE 0
-#define TRUE 1
+#define MAX 1000000000
+#define BUF_SIZE 10
 
-pthread_mutex_t mutex;
-pthread_mutex_t empty;
-pthread_mutex_t full;
+pthread_mutex_t mutex; // = PTHREAD_MUTEX_INITIALIZER;          /* quantos numeros produzir */
+pthread_cond_t empty; // = PTHREAD_COND_INITIALIZER;            /* usado para sinalizacao */
+pthread_cond_t full; // = PTHREAD_COND_INITIALIZER;             /* usado para sinalizacao */
 
-int *buffer;
-int *global_item;
+int buffer = -1;                             /* buffer usado entre produtor e consumidor */
 
-#define N 10
+void *producer(void *ptr) {                 /* dados do produtor */
+    for (int i = 1; i <= MAX; i++) {
+        pthread_mutex_lock(&mutex);     /* obtem acesso exclusivo ao buffer */
+        while (buffer == BUF_SIZE) pthread_cond_wait(&full, &mutex);
 
-int produce_item() {
-	*global_item = *global_item + 1;
-	printf("Produz item: %d\n", *global_item);
-	return *global_item;
+        // if buf_index == buf_size, wait full, mutex
+
+        buffer++;                         /*coloca item no buffer */
+        printf("producer: %d\n", buffer);
+
+        pthread_cond_signal(&empty);        /* acorda consumidor */
+        pthread_mutex_unlock(&mutex);   /* libera acesso ao buffer */
+
+        usleep(500 * 1000);
+    }
+    pthread_exit(0);
 }
 
-void consume_item(int item) {
-	int n;
-	// sem_getvalue(full, &n);
-	printf("Consome item %d \n", buffer[n]);
-}
+void *consumer(void *ptr) { /* dados do consumidor */
+    for (int i = 1; i <= MAX; i++) {
+        pthread_mutex_lock(&mutex);     /* obtem acesso exclusivo ao buffer */
 
-void insert_item(int item) {
-	int n;
-	// sem_getvalue(full, &n);
-	buffer[n] = item;
-}
+        // buf_index == -1, wait empty, mutex
+        while (buffer == -1) pthread_cond_wait(&empty, &mutex);
 
-int remove_item() {
-	int n;
-	// sem_getvalue(full, &n);
-	return buffer[n];
-}
+        buffer--;                         /* retira o item do buffer */
 
-void down(pthread_mutex_t *sem) {
-	pthread_mutex_lock(sem);
-}
+        printf("consumer: %d\n", buffer);
 
-void up(pthread_mutex_t *sem) {
-	pthread_mutex_unlock(sem);
-}
+        pthread_cond_signal(&full);        /* acorda o produtor */
+        pthread_mutex_unlock(&mutex);   /* libera acesso ao buffer */
 
-void *producer(void *args) {
-	int item;
-
-	while (TRUE) {
-		item = produce_item();  /* gera algo para por no buffer */
-		down(&empty);            /* decresce o contador empty */
-		down(&mutex);            /* entra na regiao critica */
-		insert_item(item);      /* poe novo item no buffer */
-		up(&mutex);              /* sai da regiao critica */
-		up(&full);               /* incrementa o contador de lugares preenchidos */
-
-		usleep(100 * 1000);
-	}
-}
-
-void *consumer(void *args) {
-	int item;
-
-	while (TRUE) {
-		down(&full);             /* decresce o contador full */
-		down(&mutex);            /* entra na regiao critica */
-		item = remove_item();   /* pega item do buffer */
-		up(&mutex);              /* sai da regiao critica */
-		up(&empty);              /* incrementa o contador de lugares vazios */
-		consume_item(item);     /* faz algo com o item */
-
-		usleep(300 * 1000);
-	}
+        usleep(500 * 1000);
+    }
+    pthread_exit(0);
 }
 
 int main(int argc, char **argv) {
+    pthread_t thread_producer, thread_consumer;
 
-	pthread_mutex_init(&mutex, NULL);
-	pthread_mutex_init(&empty, NULL);
-	pthread_mutex_init(&full, NULL);
+    pthread_mutex_init(&mutex, 0);
+    pthread_cond_init(&empty, 0);
+    pthread_cond_init(&full, 0);
 
-	int n, m;
+    pthread_create(&thread_consumer, NULL, consumer, NULL);
+    pthread_create(&thread_producer, NULL, producer, NULL);
 
-	printf("Informe o valor de m consumidores: ");
-	scanf("%d", &m);
+    pthread_join(thread_producer, NULL);
+    pthread_join(thread_consumer, NULL);
 
-	printf("Informe o valor de n produtores: ");
-	scanf("%d", &n);
-
-	buffer = (int *) mmap(NULL, sizeof(int) * N, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0);
-	global_item = (int *) mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0);
-
-	if (buffer == MAP_FAILED) {
-		printf("NMAP Error\n");
-		return EXIT_FAILURE;
-	}
-
-	int *ids_producer = malloc(n * sizeof(int));
-	pthread_t *thread_producer_id = malloc(n * sizeof(pthread_t));
-
-	int *ids_costumer = malloc(m * sizeof(int));
-	pthread_t *thread_consumer_id = malloc(m * sizeof(pthread_t));
-
-	for (int i = 0; i < n; i++) {
-		ids_producer[i] = i;
-		if (pthread_create(&thread_producer_id[i], NULL, producer, (void *) &ids_producer[i]) != 0) {
-			printf("Producer thread [%d] not created.\n", i);
-			exit(0);
-		}
-	}
-
-	for (int i = 0; i < m; i++) {
-		ids_costumer[i] = i;
-		if (pthread_create(&thread_consumer_id[i], NULL, consumer, (void *) &ids_costumer[i]) != 0) {
-			printf("Consumer thread [%d] not created.\n", i);
-			exit(0);
-		}
-	}
-
-	munmap(buffer, sizeof(int) * N);
-	munmap(global_item, sizeof(int));
-
-	pthread_mutex_destroy(&mutex);
-	pthread_mutex_destroy(&empty);
-	pthread_mutex_destroy(&full);
-
-	return EXIT_SUCCESS;
+    pthread_cond_destroy(&empty);
+    pthread_cond_destroy(&full);
+    pthread_mutex_destroy(&mutex);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
