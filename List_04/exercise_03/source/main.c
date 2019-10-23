@@ -1,89 +1,133 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <sys/mman.h>
 
 /******************************************************************************
  * O problema 1 desta lista será implementado com threads e mutexes (POSIX).
  *****************************************************************************/
 
-#define MAX 1000000000
-#define BUF_SIZE 10
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-pthread_mutex_t mutex; // = PTHREAD_MUTEX_INITIALIZER;          /* quantos numeros produzir */
-pthread_cond_t empty; // = PTHREAD_COND_INITIALIZER;            /* usado para sinalizacao */
-pthread_cond_t full; // = PTHREAD_COND_INITIALIZER;             /* usado para sinalizacao */
+#define N 10
+#define TRUE 1
+#define FALSE 0
 
-int buffer = -1;                             /* buffer usado entre produtor e consumidor */
+int *buffer;            /* buffer usado entre produtor e consumidor */
+int *global_item;       /* item para contator global */
+int buffer_pos = -1;    /* posicao do buffer */
 
-void *producer(void *ptr) {                 /* dados do produtor */
-    for (int i = 1; i <= MAX; i++) {
-        pthread_mutex_lock(&mutex);     /* obtem acesso exclusivo ao buffer */
-        while (buffer == BUF_SIZE) pthread_cond_wait(&full, &mutex);
+pthread_mutex_t mutex;
+pthread_cond_t empty;       /* usado para sinalizacao */
+pthread_cond_t full;        /* usado para sinalizacao */
 
-        // if buf_index == buf_size, wait full, mutex
 
-        buffer++;                         /*coloca item no buffer */
-        printf("producer: %d\n", buffer);
-
-        pthread_cond_signal(&empty);        /* acorda consumidor */
-        pthread_mutex_unlock(&mutex);   /* libera acesso ao buffer */
-
-        usleep(500 * 1000);
-    }
-    pthread_exit(0);
+void lock(pthread_mutex_t *m) {
+	pthread_mutex_lock(m);
 }
 
-void *consumer(void *ptr) { /* dados do consumidor */
-    for (int i = 1; i <= MAX; i++) {
-        pthread_mutex_lock(&mutex);     /* obtem acesso exclusivo ao buffer */
+void unlock(pthread_mutex_t *m) {
+	pthread_mutex_unlock(m);
+}
 
-        // buf_index == -1, wait empty, mutex
-        while (buffer == -1) pthread_cond_wait(&empty, &mutex);
+void signal(pthread_cond_t *c) {
+	pthread_cond_signal(c);
+}
 
-        buffer--;                         /* retira o item do buffer */
+void wait(pthread_cond_t *c, pthread_mutex_t *m) {
+	pthread_cond_wait(c, m);
+}
 
-        printf("consumer: %d\n", buffer);
+void produce_item(int producer_id) {
+	buffer_pos++;                           /*coloca item no buffer */
+	*global_item = *global_item + 1;
+	buffer[buffer_pos] = *global_item;
+	printf("Produtor [%d] produzindo item: %d\n", producer_id, *global_item);
+}
 
-        pthread_cond_signal(&full);        /* acorda o produtor */
-        pthread_mutex_unlock(&mutex);   /* libera acesso ao buffer */
+void consume_item(int consumer_id) {
+	printf("Consumidor [%d] consumindo item: %d \n", consumer_id, buffer[buffer_pos]);
+	buffer_pos--;                           /* retira o item do buffer */
+}
 
-        usleep(500 * 1000);
-    }
-    pthread_exit(0);
+void *producer(void *args) {                /* dados do produtor */
+	int *producer_id = (int *) args;
+	while (TRUE) {
+		lock(&mutex);                       /* obtem acesso exclusivo ao buffer */
+
+		while (buffer_pos == N) wait(&full, &mutex);    /* chega se o buffer está cheio */
+
+		produce_item(*producer_id);          /* produz item */
+
+		signal(&empty);                      /* acorda consumidor */
+		unlock(&mutex);                      /* libera acesso ao buffer */
+
+		usleep(500 * 1000);
+	}
+}
+
+void *consumer(void *args) {                 /* dados do consumidor */
+	int *consumer_id = (int *) args;
+	while (TRUE) {
+		lock(&mutex);                        /* obtem acesso exclusivo ao buffer */
+
+		while (buffer_pos == -1) wait(&empty, &mutex);    /* checa se o buffer está vazio */
+
+		consume_item(*consumer_id);          /* consome item */
+
+		signal(&full);                       /* acorda o produtor */
+		unlock(&mutex);                      /* libera acesso ao buffer */
+
+		usleep(550 * 1000);
+	}
 }
 
 int main(int argc, char **argv) {
-    pthread_t thread_producer, thread_consumer;
+	pthread_t *thread_producer, *thread_consumer;
+	int *producer_ids, *consumer_ids, m, n;
 
-    pthread_mutex_init(&mutex, 0);
-    pthread_cond_init(&empty, 0);
-    pthread_cond_init(&full, 0);
+	buffer = (int *) mmap(NULL, sizeof(int) * N, PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0);
+	global_item = (int *) mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_ANON | MAP_SHARED, -1, 0);
 
-    pthread_create(&thread_consumer, NULL, consumer, NULL);
-    pthread_create(&thread_producer, NULL, producer, NULL);
+	pthread_mutex_init(&mutex, 0);
+	pthread_cond_init(&empty, 0);
+	pthread_cond_init(&full, 0);
 
-    pthread_join(thread_producer, NULL);
-    pthread_join(thread_consumer, NULL);
+	printf("Informe o valor de m consumidores: ");
+	scanf("%d", &m);
 
-    pthread_cond_destroy(&empty);
-    pthread_cond_destroy(&full);
-    pthread_mutex_destroy(&mutex);
+	printf("Informe o valor de n produtores: ");
+	scanf("%d", &n);
+
+	thread_producer = malloc(n * sizeof(pthread_t));
+	thread_consumer = malloc(m * sizeof(pthread_t));
+
+	producer_ids = malloc(n * sizeof(int));
+	consumer_ids = malloc(m * sizeof(int));
+
+	for (int i = 0; i < 2; i++) {
+		producer_ids[i] = consumer_ids[i] = i;
+		if (pthread_create(&thread_producer[i], NULL, producer, (void *) &producer_ids[i]) != 0) {
+			printf("Thread not created.\n");
+			exit(0);
+		}
+		if (pthread_create(&thread_consumer[i], NULL, consumer, (void *) &consumer_ids[i]) != 0) {
+			printf("Thread not created.\n");
+			exit(0);
+		}
+	}
+
+	for (int i = 0; i < 2; i++) {
+		pthread_join(thread_producer[i], NULL);
+		pthread_join(thread_consumer[i], NULL);
+	}
+
+	pthread_cond_destroy(&empty);
+	pthread_cond_destroy(&full);
+	pthread_mutex_destroy(&mutex);
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#pragma clang diagnostic pop
