@@ -5,7 +5,9 @@
 #ifndef EXERCISE_LIST_OPERATIONAL_SYSTEMS_SHARED_H
 #define EXERCISE_LIST_OPERATIONAL_SYSTEMS_SHARED_H
 
-struct item {
+extern int i;
+
+struct Message {
     int id;
     char astr[64];
 };
@@ -13,6 +15,18 @@ struct item {
 #define TRUE 1
 #define FALSE 0
 
-#define MQNAME "/justaname"
+#define MQ_NAME "/justaname"
+
+int produce_item();
+
+void consume_item(int item);
+
+void receive(mqd_t mq, struct Message *message);
+
+int extract_item(struct Message *message);
+
+void build_message(struct Message *message, int item);
+
+void send(mqd_t mq, struct Message *message);
 
 #endif //EXERCISE_LIST_OPERATIONAL_SYSTEMS_SHARED_H

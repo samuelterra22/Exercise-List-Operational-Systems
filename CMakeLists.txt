@@ -23,6 +23,7 @@ add_executable(Exercise_List_Operational_Systems
 
         List_05/exercise_01/source/producer.c
         List_05/exercise_01/source/consumer.c
+        List_05/exercise_01/source/shared.c
         List_05/exercise_01/source/shared.h
 
         List_05/exercise_02/source/main.c

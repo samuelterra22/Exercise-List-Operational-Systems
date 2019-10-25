@@ -7,10 +7,10 @@
 all: producer consumer
 
 consumer: source/consumer.c
-	gcc -Wall -o consumer source/consumer.c -lrt
+	gcc -o consumer source/consumer.c source/shared.c -lrt
 
 producer: source/producer.c
-	gcc -Wall -o producer source/producer.c -lrt
+	gcc -o producer source/producer.c source/shared.c -lrt
 
 clean:
 	rm -fr *~ producer consumer

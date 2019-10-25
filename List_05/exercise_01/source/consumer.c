@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <mqueue.h>
+#include <zconf.h>
 
 /******************************************************************************
  * No presente exercício, Message Queues do POSIX devem ser utilizadas
@@ -8,50 +10,56 @@
  * consumidores serão processos separados, iniciados pelo usuário e utilizarão
  * troca de mensagens para sua operação.
  *****************************************************************************/
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
-#include <stdlib.h>
-#include <mqueue.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
 #include "shared.h"
 
+#define N 10
+
 int main() {
-    mqd_t mq;
-    struct mq_attr mq_attr;
-    struct item *itemptr;
-    int n, buflen;
-    char *bufptr;
+	mqd_t producer;
+	struct mq_attr mq_attr;
+	struct Message m;
+	int item;
 
-    mq = mq_open(MQNAME, O_RDWR | O_CREAT, 0666, NULL);
+	struct mq_attr attr;
+	attr.mq_flags = 0;                            /* Flags: 0 or O_NONBLOCK */
+	attr.mq_maxmsg = 10;                        /* Max. # of messages on queue */
+	attr.mq_msgsize = sizeof(struct Message);    /* Max. Message size (bytes) */
+	attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
 
-    if (mq == -1) {
-        perror("can not create msg queue\n");
-        exit(1);
-    }
+	producer = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0644, &attr);
 
-    mq_getattr(mq, &mq_attr);
-    printf("mq maximum msgsize = %d\n", (int) mq_attr.mq_msgsize);
+	if (producer == -1) {
+		perror("can not create msg queue\n");
+		exit(1);
+	}
 
-    /* allocate large enough space for the buffer */
-    buflen = mq_attr.mq_msgsize;
-    bufptr = (char *) malloc(buflen);
+	mq_getattr(producer, &mq_attr);
+	printf("mq maximum msgsize = %d\n", (int) mq_attr.mq_msgsize);
 
-    while (TRUE) {
-        n = mq_receive(mq, (char *) bufptr, buflen, NULL);
-        if (n == -1) {
-            perror("mq_receive failed\n");
-            exit(1);
-        }
-        printf("mq_receive success, message size=%d\n", n);
-        itemptr = (struct item *) bufptr;
-        printf("item->id = %d\n", itemptr->id);
-        printf("item->astr = %s\n", itemptr->astr);
-        printf("\n");
-    }
+	for (int j = 0; j < N; j++) send(producer, &m); /* envia N mensagens vazias */
 
-    free(bufptr);
-    mq_close(mq);
-    return EXIT_SUCCESS;
+	while (TRUE) {
+		printf("vai receber\n");
+		receive(producer, &m);
+
+		printf("vai extrair\n");
+		item = extract_item(&m);
+
+		printf("vai enviar\n");
+		send(producer, &m);
+
+		printf("vai consumir\n");
+		consume_item(item);
+
+		printf("vai dormir 1s\n");
+		sleep(1);
+	}
+
+	mq_close(producer);
+	return EXIT_SUCCESS;
 }
+
+#pragma clang diagnostic pop

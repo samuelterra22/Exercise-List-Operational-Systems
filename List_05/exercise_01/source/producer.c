@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <mqueue.h>
 #include <unistd.h>
-#include <string.h>
 #include "shared.h"
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 
 /******************************************************************************
  * No presente exercício, Message Queues do POSIX devem ser utilizadas
@@ -14,32 +16,43 @@
  *****************************************************************************/
 
 int main() {
-    mqd_t mq;
-    struct item item;
-    int n, i = 0;
+	mqd_t consumer;
+	struct Message m;
+	int item;
 
-    mq = mq_open(MQNAME, O_RDWR);
+	struct mq_attr attr;
+	attr.mq_flags = 0;                            /* Flags: 0 or O_NONBLOCK */
+	attr.mq_maxmsg = 10;                        /* Max. # of messages on queue */
+	attr.mq_msgsize = sizeof(struct Message);    /* Max. Message size (bytes) */
+	attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
 
-    if (mq == -1) {
-        perror("mq_open failed\n");
-        exit(1);
-    }
+	consumer = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0644, &attr);
 
-    while (TRUE) {
-        item.id = i;
-        strcpy(item.astr, "os is good\n");
+	if (consumer == -1) {
+		perror("mq_open failed\n");
+		exit(EXIT_FAILURE);
+	}
 
-        n = mq_send(mq, (char *) &item, sizeof(struct item), 0);
+	while (TRUE) {
 
-        if (n == -1) {
-            perror("mq_send failed\n");
-            exit(1);
-        }
+		printf("vai extrair\n");
+		item = produce_item();
 
-        i++;
-        sleep(1);
-    }
+		printf("vai receber\n");
+		receive(consumer, &m);
 
-    mq_close(mq);
-    return EXIT_SUCCESS;
+		printf("vai montar mensagem\n");
+		build_message(&m, item);
+
+		printf("vai enviar\n");
+		send(consumer, &m);
+
+		printf("vai dormir 1s\n");
+		sleep(1);
+	}
+
+	mq_close(consumer);
+	return EXIT_SUCCESS;
 }
+
+#pragma clang diagnostic pop
