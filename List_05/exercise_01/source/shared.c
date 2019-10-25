@@ -22,10 +22,6 @@ void receive(mqd_t mq, struct Message *message) {
 		perror("mq_receive failed\n");
 		exit(EXIT_FAILURE);
 	}
-
-//	printf("asdasd: %d\n", message->id);
-
-//	printf("mq_receive success, message size=%d\n", n);
 }
 
 int extract_item(struct Message *message) {

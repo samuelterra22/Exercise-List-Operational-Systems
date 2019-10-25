@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mqueue.h>
-#include <zconf.h>
+#include <unistd.h>
 
 /******************************************************************************
  * No presente exercício, Message Queues do POSIX devem ser utilizadas
@@ -18,48 +18,46 @@
 #define N 10
 
 int main() {
-	mqd_t producer;
-	struct mq_attr mq_attr;
-	struct Message m;
-	int item;
+    mqd_t producer, consumer;
+    struct mq_attr mq_attr;
+    struct Message m;
+    int item;
 
-	struct mq_attr attr;
-	attr.mq_flags = 0;                            /* Flags: 0 or O_NONBLOCK */
-	attr.mq_maxmsg = 10;                        /* Max. # of messages on queue */
-	attr.mq_msgsize = sizeof(struct Message);    /* Max. Message size (bytes) */
-	attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
+    struct mq_attr attr;
+    attr.mq_flags = 0;                          /* Flags: 0 or O_NONBLOCK */
+    attr.mq_maxmsg = 10;                        /* Max. # of messages on queue */
+    attr.mq_msgsize = sizeof(struct Message);   /* Max. Message size (bytes) */
+    attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
 
-	producer = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0644, &attr);
+    producer = mq_open(MQ_NAME_PRODUCER, O_RDWR | O_CREAT, 0644, &attr);
+    consumer = mq_open(MQ_NAME_CONSUMER, O_RDWR | O_CREAT, 0644, &attr);
 
-	if (producer == -1) {
-		perror("can not create msg queue\n");
-		exit(1);
-	}
+    if (producer == -1) {
+        perror("can not create producer msg queue\n");
+        exit(1);
+    }
 
-	mq_getattr(producer, &mq_attr);
-	printf("mq maximum msgsize = %d\n", (int) mq_attr.mq_msgsize);
+    if (consumer == -1) {
+        perror("can not create consumer msg queue\n");
+        exit(1);
+    }
 
-	for (int j = 0; j < N; j++) send(producer, &m); /* envia N mensagens vazias */
+    mq_getattr(producer, &mq_attr);
+    printf("mq maximum msgsize = %d\n", (int) mq_attr.mq_msgsize);
 
-	while (TRUE) {
-		printf("vai receber\n");
-		receive(producer, &m);
+    for (int j = 0; j < N; j++) send(producer, &m); /* envia N mensagens vazias */
 
-		printf("vai extrair\n");
-		item = extract_item(&m);
+    while (TRUE) {
+        receive(consumer, &m);
+        item = extract_item(&m);
+        send(producer, &m);
+        consume_item(item);
 
-		printf("vai enviar\n");
-		send(producer, &m);
+        sleep(1);
+    }
 
-		printf("vai consumir\n");
-		consume_item(item);
-
-		printf("vai dormir 1s\n");
-		sleep(1);
-	}
-
-	mq_close(producer);
-	return EXIT_SUCCESS;
+    mq_close(producer);
+    return EXIT_SUCCESS;
 }
 
 #pragma clang diagnostic pop

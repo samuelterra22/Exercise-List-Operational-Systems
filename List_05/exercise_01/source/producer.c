@@ -16,43 +16,40 @@
  *****************************************************************************/
 
 int main() {
-	mqd_t consumer;
-	struct Message m;
-	int item;
+    mqd_t producer, consumer;
+    struct Message m;
+    int item;
 
-	struct mq_attr attr;
-	attr.mq_flags = 0;                            /* Flags: 0 or O_NONBLOCK */
-	attr.mq_maxmsg = 10;                        /* Max. # of messages on queue */
-	attr.mq_msgsize = sizeof(struct Message);    /* Max. Message size (bytes) */
-	attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
+    struct mq_attr attr;
+    attr.mq_flags = 0;                          /* Flags: 0 or O_NONBLOCK */
+    attr.mq_maxmsg = 10;                        /* Max. # of messages on queue */
+    attr.mq_msgsize = sizeof(struct Message);   /* Max. Message size (bytes) */
+    attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
 
-	consumer = mq_open(MQ_NAME, O_RDWR | O_CREAT, 0644, &attr);
+    producer = mq_open(MQ_NAME_PRODUCER, O_RDWR | O_CREAT, 0644, &attr);
+    consumer = mq_open(MQ_NAME_CONSUMER, O_RDWR | O_CREAT, 0644, &attr);
 
-	if (consumer == -1) {
-		perror("mq_open failed\n");
-		exit(EXIT_FAILURE);
-	}
+    if (producer == -1) {
+        perror("mq_open producer failed\n");
+        exit(EXIT_FAILURE);
+    }
 
-	while (TRUE) {
+    if (consumer == -1) {
+        perror("mq_open consumer failed\n");
+        exit(EXIT_FAILURE);
+    }
 
-		printf("vai extrair\n");
-		item = produce_item();
+    while (TRUE) {
+        item = produce_item();
+        receive(producer, &m);
+        build_message(&m, item);
+        send(consumer, &m);
 
-		printf("vai receber\n");
-		receive(consumer, &m);
+        sleep(1);
+    }
 
-		printf("vai montar mensagem\n");
-		build_message(&m, item);
-
-		printf("vai enviar\n");
-		send(consumer, &m);
-
-		printf("vai dormir 1s\n");
-		sleep(1);
-	}
-
-	mq_close(consumer);
-	return EXIT_SUCCESS;
+    mq_close(consumer);
+    return EXIT_SUCCESS;
 }
 
 #pragma clang diagnostic pop

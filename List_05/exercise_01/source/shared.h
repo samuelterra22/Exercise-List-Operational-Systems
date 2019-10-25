@@ -15,7 +15,8 @@ struct Message {
 #define TRUE 1
 #define FALSE 0
 
-#define MQ_NAME "/justaname"
+#define MQ_NAME_PRODUCER "/mq_producer"
+#define MQ_NAME_CONSUMER "/mq_consumer"
 
 int produce_item();
 
