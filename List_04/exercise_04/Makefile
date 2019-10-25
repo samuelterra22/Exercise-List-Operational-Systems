@@ -1,7 +1,7 @@
-##################### Exercise 1 Makefile #######################
+##################### Exercise 4 Makefile #######################
 # AUTHOR:   Samuel Terra Vieira                                 #
 # ADDRESS:  Universidade Federal de Lavras                      #
-# DATE:     23/09/2019                                          #
+# DATE:     09/2019                                             #
 #################################################################
 
 # The project name
