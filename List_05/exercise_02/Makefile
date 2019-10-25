@@ -5,6 +5,6 @@
 #################################################################
 
 # The project name
-PROJECT_NAME=exercise01
+PROJECT_NAME=exercise02
 
 include ../../Makefile.mk
