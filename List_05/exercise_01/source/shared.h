@@ -9,7 +9,6 @@ extern int i;
 
 struct Message {
     int id;
-    char astr[64];
 };
 
 #define TRUE 1

@@ -30,7 +30,6 @@ int extract_item(struct Message *message) {
 
 void build_message(struct Message *message, int item) {
 	message->id = item;
-	strcpy(message->astr, "os is good\n");
 }
 
 void send(mqd_t mq, struct Message *message) {
