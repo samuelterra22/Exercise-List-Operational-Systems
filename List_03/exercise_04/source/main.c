@@ -19,93 +19,69 @@
 #define FALSE 0
 #define TRUE 1
 
-#define MAX_COMMAND_LENGHT 100
+#define MAX_COMMAND_LENGTH 100
 
-char **explode(char *str) {
+int num_of_empty_spaces(char *string) {
+    int spaces = 0;
 
-    int i = 0, cont = 0;
+    /* remove the 'enter' key */
+    string[strlen(string) - 1] = '\0';
+
+    /* search empty spaces */
+    for (int i = 0; i < strlen(string); ++i)
+        if (string[i] == ' ')
+            spaces++;
+
+    return spaces;
+}
+
+char **explode_command(char *str) {
     const char s[2] = " ";
     char *token;
+    int i = 0;
+
+    int blanks = num_of_empty_spaces(str);
+
+    /* alloc memory for array arguments */
+    char **ret = malloc(sizeof(char *) * (blanks + 2));
 
     /* get the first token */
     token = strtok(str, s);
 
-    char **ret = malloc(sizeof(*ret));
-
     while (token != NULL) {
-        // printf(" %s\n", token);
-
-        printf("cu: %d\n", (i + 1) * sizeof(ret));
-        ret = realloc(ret, (i + 1) * sizeof(ret));
-        ret[i] = malloc(254 * sizeof(char *));
-        strcpy(ret[i], token);
-
-//        printf(" %s\n", ret[i]);
-
+        ret[i] = token;
         token = strtok(NULL, s);
         i++;
     }
-    printf("i: %d\n", i);
 
+    ret[blanks + 1] = NULL;
 
     return ret;
 }
 
-void pointer_to_char_vector(char **c) {
-    printf("vaca\n");
-    printf("%d\n", strlen(c));
-    printf("%d\n", sizeof(c));
-    printf("%d\n", strlen(*c));
-    printf("%d\n", sizeof(*c));
-    for (int j = 0; j < sizeof(*c); j++) {
-        printf("-> %s\n", c[j]);
-    }
-}
-
 int main(int argc, const char *argv[]) {
 
-    char command[MAX_COMMAND_LENGHT];
-    int exit_shell = TRUE;
+    char command[MAX_COMMAND_LENGTH];
+    int exit_shell = FALSE;
 
     pid_t pid;
     char command_base[] = "/bin/";
 
-    fgets(command, MAX_COMMAND_LENGHT, stdin);
-    char **c = explode(command);
-    // printf("depois do explode %s", command);
-
-    printf("1c: %d\n", strlen(c));
-    printf("2c: %d\n", sizeof(c));
-    printf("3c: %d\n", strlen(*c));
-    printf("4c: %d\n", sizeof(*c));
-    printf("5c: %d\n", strlen(**c));
-    printf("6c: %d\n", sizeof(**c));
-
-//    pointer_to_char_vector(c);
-    for (int j = 0; j < sizeof(c) - 1; j++) printf("->%s\n", c[j]);
-
-
-
-    // printf("> ");
+    printf("> ");
     while (!exit_shell) {
-        scanf("%s", command);
+        fgets(command, MAX_COMMAND_LENGTH, stdin);
 
         pid = fork();
 
         strcat(command_base, command);
 
-        char **c = explode(command);
-        printf("%s", command);
-        for (int j = 0; j < sizeof(**c) - 1; j++) printf("%s\t", c[j]);
-
         if (pid == 0) {
-            char *argvs[3] = {command, NULL};
+            char **argvs = explode_command(command);
+
             if (execvp(command_base, argvs) == -1) {
-                printf("Erro - Comando nao existe\n");
+                printf("Erro ao executar o comando!\n");
                 _exit(EXIT_SUCCESS);
             }
-
-
             printf("\n");
         } else {
             while (wait(NULL) > 0);
