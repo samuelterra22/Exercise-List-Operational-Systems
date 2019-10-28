@@ -67,6 +67,7 @@ int main(int argc, const char *argv[]) {
     pid_t pid;
     char command_base[] = "/bin/";
 
+	printf("Custom bash. Type 'exit' to quit.\n");
     printf("> ");
     while (!exit_shell) {
         fgets(command, MAX_COMMAND_LENGTH, stdin);
