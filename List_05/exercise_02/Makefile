@@ -7,10 +7,10 @@
 all: watcher listener
 
 listener: source/listener.c
-	gcc -o listener source/listener.c source/shared.c -lrt
+	gcc -o listener source/listener.c source/message.c -lrt
 
 watcher: source/watcher.c
-	gcc -o watcher source/watcher.c source/shared.c -lrt
+	gcc -o watcher source/watcher.c source/message.c -lrt
 
 clean:
 	rm -fr *~ watcher listener

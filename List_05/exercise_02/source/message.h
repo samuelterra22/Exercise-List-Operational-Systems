@@ -1,9 +1,9 @@
-#ifndef EXERCISE_LIST_OPERATIONAL_SYSTEMS_SHARED_H
-#define EXERCISE_LIST_OPERATIONAL_SYSTEMS_SHARED_H
+#ifndef EXERCISE_LIST_OPERATIONAL_SYSTEMS_MESSAGE
+#define EXERCISE_LIST_OPERATIONAL_SYSTEMS_MESSAGE
 
 struct Message {
     int id;
-    struct inotify_event *event;
+    struct inotify_event event;
 };
 
 #define TRUE 1
@@ -25,4 +25,4 @@ void send(mqd_t mq, struct Message *message);
 
 void display_inotify_event(struct inotify_event *i);
 
-#endif //EXERCISE_LIST_OPERATIONAL_SYSTEMS_SHARED_H
+#endif //EXERCISE_LIST_OPERATIONAL_SYSTEMS_MESSAGE

@@ -3,32 +3,34 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/inotify.h>
+#include <limits.h>
+#include <unistd.h>
 
-#include "shared.h"
+#include "message.h"
 
 void receive(mqd_t mq, struct Message *message) {
-	int n = mq_receive(mq, (char *) message, sizeof(struct Message), NULL);
-	if (n == -1) {
-		perror("mq_receive failed\n");
-		exit(EXIT_FAILURE);
-	}
+    int n = mq_receive(mq, (char *) message, sizeof(struct Message) + NAME_MAX + 1, NULL);
+    if (n == -1) {
+        perror("mq_receive failed\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
-struct inotify_event* extract_item(struct Message *message) {
-	return message->event;
+struct inotify_event *extract_item(struct Message *message) {
+    return &message->event;
 }
 
 void build_message(struct Message *message, struct inotify_event *event) {
-    message->event = event;
+    memcpy(&message->event, event, sizeof(struct inotify_event) + strlen(event->name) + 1);
 }
 
 void send(mqd_t mq, struct Message *message) {
-	int n = mq_send(mq, (char *) message, sizeof(struct Message), 0);
+    int n = mq_send(mq, (char *) message, sizeof(struct Message) + strlen(message->event.name) + 1, 0);
 
-	if (n == -1) {
-		perror("mq_send failed\n");
-		exit(EXIT_FAILURE);
-	}
+    if (n == -1) {
+        perror("mq_send failed\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /* Display information from inotify_event structure */

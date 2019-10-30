@@ -28,8 +28,8 @@ add_executable(Exercise_List_Operational_Systems
 
         List_05/exercise_02/source/watcher.c
         List_05/exercise_02/source/listener.c
-        List_05/exercise_02/source/shared.c
-        List_05/exercise_02/source/shared.h
+        List_05/exercise_02/source/message.c
+        List_05/exercise_02/source/message.h
 
         List_05/exercise_03/source/main.c
         )
