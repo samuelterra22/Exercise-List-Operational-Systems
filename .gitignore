@@ -56,3 +56,6 @@ dkms.conf
 
 # CMakeDebug folder
 cmake-build-debug/
+
+listener
+watcher
