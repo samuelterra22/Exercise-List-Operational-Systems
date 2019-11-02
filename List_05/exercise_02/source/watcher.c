@@ -40,8 +40,11 @@ int main(int argc, char *argv[]) {
     attr.mq_msgsize = sizeof(struct Message) + NAME_MAX + 1;   /* Max. Message size (bytes) */
     attr.mq_curmsgs = 0;                        /* # of messages currently in queue */
 
-    if (argc < 2 || strcmp(argv[1], "--help") == 0)
-        printf("%s pathname...\n", argv[0]);
+	if (argv[1] == NULL) {
+		printf("Inform the watcher path!\n");
+		printf("example to run: $ ./watcher [watcher_path]\n");
+		exit(EXIT_FAILURE);
+	}
 
     inotify_fd = inotify_init();                 /* Create inotify instance */
     if (inotify_fd == -1)

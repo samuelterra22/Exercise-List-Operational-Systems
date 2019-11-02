@@ -21,13 +21,9 @@
  * arquivos.
  *****************************************************************************/
 
-void handle_message(struct Message *message, char *watcher_path, char *listener_path) {
-	// IN_CREATE
-	// IN_DELETE
-	// IN_MODIFY
-	// IN_MOVED_FROM
-	// IN_MOVED_TO
+char move_from_path[NAME_MAX];
 
+void handle_message(struct Message *message, char *watcher_path, char *listener_path) {
 	char *path_tmp = malloc(sizeof(char) * strlen(listener_path));
 	strcpy(path_tmp, listener_path);
 
@@ -35,6 +31,7 @@ void handle_message(struct Message *message, char *watcher_path, char *listener_
 
 	display_inotify_event(event);
 
+	// IN_CREATE
 	if (event->mask & IN_CREATE) {
 		if (event->mask & IN_ISDIR) {
 			mkdir(strcat(path_tmp, event->name), 0644);
@@ -44,6 +41,7 @@ void handle_message(struct Message *message, char *watcher_path, char *listener_
 		}
 	}
 
+	// IN_DELETE
 	if (event->mask & IN_DELETE) {
 		if (event->mask & IN_ISDIR) {
 			rmdir(strcat(path_tmp, event->name));
@@ -52,11 +50,9 @@ void handle_message(struct Message *message, char *watcher_path, char *listener_
 		}
 	}
 
+	// IN_MODIFY
 	if (event->mask & IN_MODIFY) {
-		printf("----------- move from %s\n", watcher_path);
-		printf("----------- move to %s\n", listener_path);
-
-		char source[PATH_MAX], destiny[PATH_MAX];
+		char source[NAME_MAX], destiny[NAME_MAX];
 		FILE *source_file, *destiny_file;
 
 		strcpy(source, watcher_path);
@@ -65,17 +61,11 @@ void handle_message(struct Message *message, char *watcher_path, char *listener_
 		strcat(source, event->name);
 		strcat(destiny, event->name);
 
-		source_file = fopen(source, "r");
-		destiny_file = fopen(destiny, "w");
+		source_file = fopen(source, "r+");
+		destiny_file = fopen(destiny, "w+");
 
-		if (source_file == NULL) {
-			printf("Cannot open file %s \n", source);
-			exit(0);
-		}
-		if (destiny_file == NULL) {
-			printf("Cannot open file %s \n", destiny);
-			exit(0);
-		}
+		if (source_file == NULL) return;
+		if (destiny_file == NULL) return;
 
 		char c = fgetc(source_file);
 		while (c != EOF) {
@@ -83,9 +73,24 @@ void handle_message(struct Message *message, char *watcher_path, char *listener_
 			c = fgetc(source_file);
 		}
 
-
 		fclose(source_file);
 		fclose(destiny_file);
+	}
+
+	// IN_MOVED_FROM
+	if (event->mask & IN_MOVED_FROM) {
+		strcpy(move_from_path, listener_path);
+		strcat(move_from_path, event->name);
+		// move_from_path => [watcher path]/[file name.extension or folder] -> ex.: ./li.txt
+	}
+
+	// IN_MOVED_TO
+	if (event->mask & IN_MOVED_TO) {
+		char move_to_path[NAME_MAX];
+		strcpy(move_to_path, listener_path);
+		strcat(move_to_path, event->name);
+
+		rename(move_from_path, move_to_path);
 	}
 }
 
