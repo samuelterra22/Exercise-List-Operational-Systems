@@ -22,14 +22,14 @@
 #define MAX_COMMAND_LENGTH 100
 
 int num_of_empty_spaces(char *string) {
-	int spaces = 0;
+	int empty_spaces = 0;
 
 	/* search empty spaces */
 	for (int i = 0; i < strlen(string); ++i)
 		if (string[i] == ' ')
-			spaces++;
+			empty_spaces++;
 
-	return spaces;
+	return empty_spaces;
 }
 
 char **explode_command(char *str) {
@@ -125,14 +125,12 @@ void execute_simple_command(char *command, char **args) {
 		while (wait(NULL) > 0);
 		printf("> ");
 	}
-
 }
 
 int main(int argc, const char *argv[]) {
 
 	char command[MAX_COMMAND_LENGTH];
 	int exit_shell = FALSE;
-
 
 	char command_base[] = "/bin/";
 
@@ -156,15 +154,13 @@ int main(int argc, const char *argv[]) {
 			char *first_command = strtok(command_bkp, "|");
 			char *second_command = strtok(NULL, "");
 
-			printf("-> first_command:\t'%s'\n", first_command);
-			printf("-> second_command:\t'%s'\n", second_command);
-
 			/* execute a simple command */
 			if (second_command == NULL) {
 				char **argvs = explode_command(command);
-				printf()
 				execute_simple_command(command_base, argvs);
-			} else {
+			}
+				/* execute command with pipe */
+			else {
 				execute_pipe_command(first_command, second_command);
 			}
 
@@ -178,7 +174,6 @@ int main(int argc, const char *argv[]) {
 		/* 'reseta' o valor de command_base */
 		strcpy(command_base, "/bin/");
 	}
-
 
 	return EXIT_SUCCESS;
 }
