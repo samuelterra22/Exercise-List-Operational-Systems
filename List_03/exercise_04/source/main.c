@@ -56,11 +56,76 @@ char **explode_command(char *str) {
 	return ret;
 }
 
-void execute_simple_command(char *command, char **args) {
-	if (execvp(command, args) == -1) {
-		printf("Erro ao executar o comando!\n");
-		_exit(EXIT_SUCCESS);
+void execute_pipe_command(char *first_command, char *second_command) {
+	int fd[2];
+	pid_t pid1, pid2;
+	char command_base[] = "/bin/";
+
+	if (pipe(fd) < 0) {
+		printf("Pipe error\n");
+		return;
 	}
+
+	pid1 = fork();
+	if (pid1 < 0) {
+		printf("Fork error\n");
+		return;
+	}
+
+	if (pid1 == 0) {
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[1]);
+
+		char **args1 = explode_command(first_command);
+		printf("args1[0]: %s\n", args1[0]);
+		char *path_to_bin_command_1 = strcat(command_base, args1[0]);
+		if (execve(path_to_bin_command_1, args1, 0) < 0) {
+			printf("Command not found in %s\n", path_to_bin_command_1);
+			exit(0);
+		}
+	} else {
+		pid2 = fork();
+
+		if (pid2 < 0) {
+			printf("Fork error");
+			return;
+		}
+
+		if (pid2 == 0) {
+			close(fd[1]);
+			dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
+
+			char **args2 = explode_command(second_command);
+			char *path_to_bin_command_2 = strcat(command_base, args2[0]);
+			if (execve(path_to_bin_command_2, args2, 0) < 0) {
+				printf("Command not found in %s\n", path_to_bin_command_2);
+				exit(0);
+			}
+		} else {
+			while (wait(NULL) < 0);
+			printf("> ");
+		}
+	}
+}
+
+void execute_simple_command(char *command, char **args) {
+	pid_t pid;
+
+	pid = fork();
+
+	if (pid == 0) {
+		if (execvp(command, args) == -1) {
+			printf("Erro ao executar o comando!\n");
+			_exit(EXIT_SUCCESS);
+		}
+	} else {
+		/* aguarda processo filho */
+		while (wait(NULL) > 0);
+		printf("> ");
+	}
+
 }
 
 int main(int argc, const char *argv[]) {
@@ -68,7 +133,7 @@ int main(int argc, const char *argv[]) {
 	char command[MAX_COMMAND_LENGTH];
 	int exit_shell = FALSE;
 
-	pid_t pid;
+
 	char command_base[] = "/bin/";
 
 	printf("Custom bash. Type 'exit' to quit.\n");
@@ -86,23 +151,31 @@ int main(int argc, const char *argv[]) {
 		strcat(command_base, command);
 
 		if (strcmp(command_bkp, "exit") != 0) {
-			pid = fork();
 
-			if (pid == 0) {
+			/* quebra a linha no pipe (|) */
+			char *first_command = strtok(command_bkp, "|");
+			char *second_command = strtok(NULL, "");
+
+			printf("-> first_command:\t'%s'\n", first_command);
+			printf("-> second_command:\t'%s'\n", second_command);
+
+			/* execute a simple command */
+			if (second_command == NULL) {
 				char **argvs = explode_command(command);
-
+				printf()
 				execute_simple_command(command_base, argvs);
-
-				printf("\n");
 			} else {
-				while (wait(NULL) > 0);
-				printf("> ");
+				execute_pipe_command(first_command, second_command);
 			}
+
+			printf("\n");
 		} else {
+			/* sai do bash */
 			exit_shell = TRUE;
 			printf("God bye!\n");
 		}
 
+		/* 'reseta' o valor de command_base */
 		strcpy(command_base, "/bin/");
 	}
 
