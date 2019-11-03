@@ -22,81 +22,90 @@
 #define MAX_COMMAND_LENGTH 100
 
 int num_of_empty_spaces(char *string) {
-    int spaces = 0;
+	int spaces = 0;
 
-    /* remove the 'enter' key */
-    string[strlen(string) - 1] = '\0';
+	/* search empty spaces */
+	for (int i = 0; i < strlen(string); ++i)
+		if (string[i] == ' ')
+			spaces++;
 
-    /* search empty spaces */
-    for (int i = 0; i < strlen(string); ++i)
-        if (string[i] == ' ')
-            spaces++;
-
-    return spaces;
+	return spaces;
 }
 
 char **explode_command(char *str) {
-    const char s[2] = " ";
-    char *token;
-    int i = 0;
+	const char s[2] = " ";
+	char *token;
+	int i = 0;
 
-    int blanks = num_of_empty_spaces(str);
+	int blanks = num_of_empty_spaces(str);
 
-    /* alloc memory for array arguments */
-    char **ret = malloc(sizeof(char *) * (blanks + 2));
+	/* alloc memory for array arguments */
+	char **ret = malloc(sizeof(char *) * (blanks + 2));
 
-    /* get the first token */
-    token = strtok(str, s);
+	/* get the first token */
+	token = strtok(str, s);
 
-    while (token != NULL) {
-        ret[i] = token;
-        token = strtok(NULL, s);
-        i++;
-    }
+	while (token != NULL) {
+		ret[i] = token;
+		token = strtok(NULL, s);
+		i++;
+	}
 
-    ret[blanks + 1] = NULL;
+	ret[blanks + 1] = NULL;
 
-    return ret;
+	return ret;
+}
+
+void execute_simple_command(char *command, char **args) {
+	if (execvp(command, args) == -1) {
+		printf("Erro ao executar o comando!\n");
+		_exit(EXIT_SUCCESS);
+	}
 }
 
 int main(int argc, const char *argv[]) {
 
-    char command[MAX_COMMAND_LENGTH];
-    int exit_shell = FALSE;
+	char command[MAX_COMMAND_LENGTH];
+	int exit_shell = FALSE;
 
-    pid_t pid;
-    char command_base[] = "/bin/";
+	pid_t pid;
+	char command_base[] = "/bin/";
 
 	printf("Custom bash. Type 'exit' to quit.\n");
-    printf("> ");
-    while (!exit_shell) {
-        fgets(command, MAX_COMMAND_LENGTH, stdin);
+	printf("> ");
+	while (!exit_shell) {
+		/* read command from terminal */
+		fgets(command, MAX_COMMAND_LENGTH, stdin);
 
-        pid = fork();
+		/* remove the 'enter' key */
+		command[strlen(command) - 1] = '\0';
 
-        strcat(command_base, command);
+		char command_bkp[MAX_COMMAND_LENGTH];
+		strcpy(command_bkp, command);
 
-        if (pid == 0) {
-            char **argvs = explode_command(command);
+		strcat(command_base, command);
 
-            if (execvp(command_base, argvs) == -1) {
-                printf("Erro ao executar o comando!\n");
-                _exit(EXIT_SUCCESS);
-            }
-            printf("\n");
-        } else {
-            while (wait(NULL) > 0);
-            printf("> ");
-        }
+		if (strcmp(command_bkp, "exit") != 0) {
+			pid = fork();
 
-        if (strcmp(command, "exit") == 0) {
-            exit_shell = TRUE;
-            printf("God bye!\n");
-        }
+			if (pid == 0) {
+				char **argvs = explode_command(command);
 
-        strcpy(command_base, "/bin/");
-    }
+				execute_simple_command(command_base, argvs);
+
+				printf("\n");
+			} else {
+				while (wait(NULL) > 0);
+				printf("> ");
+			}
+		} else {
+			exit_shell = TRUE;
+			printf("God bye!\n");
+		}
+
+		strcpy(command_base, "/bin/");
+	}
 
 
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
